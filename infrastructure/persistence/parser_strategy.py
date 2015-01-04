@@ -1,14 +1,29 @@
-import logging
-import re
-import urllib
+import logging, re, urllib
 from bs4 import BeautifulSoup
 from dateutil import parser
 
-class CarpeDurham(object):
+def text(post, selector):
+    try:
+        return post.select(selector)[0].get_text()
+    except AttributeError:
+        print post, selector
+        raise
 
-    url = "http://carpedurham.wordpress.com/page/%d/"
-    page = 1
-    city = "Durham, NC"
+def href(post, selector):
+    return post.select(selector)[0]['href']
+
+def extract_date(post, selector):
+    meta = post.select(selector)[0].get_text()
+    match = re.search(r"\w+ \d{,2}, \d{4}", meta)
+    return parser.parse(match.group(0))
+
+
+class ParserStrategy(object):
+
+    url = ""
+    city = ""
+
+    selectors = {}
 
     def first(self):
         self.page = 1
@@ -19,18 +34,6 @@ class CarpeDurham(object):
         for post in self.posts:
             return post
 
-    def _posts(self):
-        page = self._get_page()
-        while page is not None:
-            soup = BeautifulSoup(page, "html5lib")
-            for post in soup.select('.post'):
-                title = post.select("h2.storytitle")[0].get_text()
-                body = post.select("div.storycontent")[0].get_text()
-                date = self._extract_date(post)
-                url = post.select("h2.storytitle a[rel=bookmark]")[0].href
-                yield {"title": title, "body": body, "date": date, "url": url}
-            page = self._get_page()
-
     def _get_page(self):
         fh = urllib.urlopen(self.url % self.page)
         self.page += 1
@@ -40,7 +43,49 @@ class CarpeDurham(object):
             return None
         return fh.read()
 
-    def _extract_date(self, post):
-        meta = post.select('div.meta')[0].get_text()
-        match = re.search(r"\w+ \d{,2}, \d{4}", meta)
-        return parser.parse(match.group(0))
+    def _posts(self):
+        page = self._get_page()
+        while page is not None:
+            soup = BeautifulSoup(page, "html.parser")
+            for post in soup.select(".post"):
+                title = text(post, self.selectors["title"])
+                body = text(post, self.selectors["body"])
+                date = extract_date(post, self.selectors["date"])
+                url = href(post, self.selectors["url"])
+                yield {"title": title, "body": body, "date": date, "url": url}
+            page = self._get_page()
+
+
+class TriangleExplorer(ParserStrategy):
+
+    url = "http://triangleexplorer.com/page/%d/"
+    city = "Durham, NC"
+
+    selectors = {
+            "title": "h2.entry-title",
+            "body": "div.entry-content",
+            "url": "h2.entry-title a[rel=bookmark]",
+            "date": "div.entry-meta"}
+
+
+class CarpeDurham(ParserStrategy):
+
+    url = "http://carpedurham.wordpress.com/page/%d/"
+    city = "Durham, NC"
+
+    selectors = {
+            "title": "h2.storytitle",
+            "body": "div.storycontent",
+            "url": "h2.storytitle a[rel=bookmark]",
+            "date": "div.meta"}
+
+class TriangleFoodBlog(ParserStrategy):
+
+    url = "http://trianglefoodblog.com/?paged=%d"
+    city = "Durham, NC"
+
+    selectors = {
+            "title": "h2.entry-title",
+            "body": "div.entry-content",
+            "url": "h2.entry-title a[rel=bookmark]",
+            "date": "div.entry-meta"}

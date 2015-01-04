@@ -1,18 +1,41 @@
 import datetime
 
-from infrastructure.persistence import http
-from infrastructure.persistence import sql
-from domain.model import blog
+from infrastructure.persistence import http, sql
+from domain.model import blog, markov, city
 
 class CrawlerService(object):
     "crawls websites"
 
-    def test(self):
-        repo = http.PostRepository.factory('Carpe Durham')
-        date = datetime.datetime(2008, 1, 1)
-        posts = repo.manyUntil(date)
+    blogs = [
+            "Carpe Durham",
+            "Triangle Explorer",
+            "Triangle Food Blog"]
+
+    def scrape(self):
 
         other_repo = sql.PostRepository()
+
+        for name in self.blogs:
+
+            repo = http.PostRepository.factory(name)
+            posts = repo.range(250)
+
+            for key, post in enumerate(posts):
+                other_repo.add(post)
+                if (key % 100 == 0):
+                    other_repo.commit()
+
+            other_repo.commit()
+
+    def build(self):
+        repo = sql.PostRepository()
+        posts = repo.range(10000)
+
+        table = markov.Markov(2)
+        table.set_bonus_words(city.durham)
+
         for post in posts:
-            other_repo.add(post)
-        other_repo.commit()
+            table.add_text(post.title)
+            table.add_text(post.body)
+
+        return table.get_text(100)

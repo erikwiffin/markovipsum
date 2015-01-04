@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker, mapper
 
 from domain.model import blog
 
-engine = create_engine('postgresql://postgres:password@localhost/markovipsum', echo=True)
+engine = create_engine('postgresql://test:password@localhost/markovipsum', echo=True)
 Session = sessionmaker(bind=engine)
 
 metadata = MetaData()
@@ -18,5 +18,4 @@ posts = Table(
         Column('city', String))
 mapper(blog.Post, posts)
 
-posts.drop(engine)
 metadata.create_all(engine)

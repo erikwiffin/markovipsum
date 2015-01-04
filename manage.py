@@ -3,8 +3,7 @@
 from flask import Flask
 import logging
 
-from ui import manager
-from ui.commands import *
+from ui import manager, commands
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

@@ -14,3 +14,7 @@ class PostRepository(blog.PostRepository):
 
     def manyUntil(self, post):
         pass
+
+    def range(self, limit, offset=0):
+        query = self.__session.query(blog.Post)
+        return query.limit(limit).offset(offset).all()
