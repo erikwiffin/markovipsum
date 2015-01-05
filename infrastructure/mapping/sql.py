@@ -1,9 +1,10 @@
+import os
 from sqlalchemy import create_engine, Table, MetaData, Column, Integer, String, Date
 from sqlalchemy.orm import sessionmaker, mapper
 
 from domain.model import blog
 
-engine = create_engine('postgresql://test:password@localhost/markovipsum', echo=True)
+engine = create_engine(os.environ['DATABASE_URL'], echo=True)
 Session = sessionmaker(bind=engine)
 
 metadata = MetaData()
