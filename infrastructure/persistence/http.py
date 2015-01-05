@@ -11,6 +11,8 @@ class PostRepository(blog.PostRepository):
     def factory(name):
         if name == "Carpe Durham":
             return PostRepository(ps.CarpeDurham())
+        if name == "Carpe Durham Wordpress":
+            return PostRepository(ps.CarpeDurhamWordpress())
         if name == "Triangle Explorer":
             return PostRepository(ps.TriangleExplorer())
         if name == "Triangle Food Blog":

@@ -41,7 +41,11 @@ class Markov(object):
         return text
 
     def __next_word(self, key):
-        return random.choice(self._table.get(key, ['']))
+        word = random.choice(self._table.get(key, [None]))
+        while word is None:
+            key = random.choice(self._table.keys())
+            word = random.choice(self._table.get(key, [None]))
+        return word
 
 def advance(key, word):
     key = list(key)

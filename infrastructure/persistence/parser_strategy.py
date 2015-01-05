@@ -13,7 +13,7 @@ def href(post, selector):
     return post.select(selector)[0]['href']
 
 def extract_date(post, selector):
-    meta = post.select(selector)[0].get_text()
+    meta = text(post, selector)
     match = re.search(r"\w+ \d{,2}, \d{4}", meta)
     return parser.parse(match.group(0))
 
@@ -56,6 +56,42 @@ class ParserStrategy(object):
             page = self._get_page()
 
 
+class CarpeDurham(ParserStrategy):
+
+    url = "http://carpedurham.com/page/%d/"
+    city = "Durham, NC"
+
+    selectors = {
+            "title": "#content .title",
+            "body": "#content .entry",
+            "url": ".title a[rel=bookmark]",
+            "date": "#stats span:nth-of-type(2)"}
+
+    def _posts(self):
+        page = self._get_page()
+        while page is not None:
+            soup = BeautifulSoup(page, "html.parser")
+            for post in soup.select("#front-list .clearfloat"):
+                url = href(post, self.selectors["url"])
+                full_post = self._full_post(url)
+                title = text(full_post, self.selectors["title"])
+                body = text(full_post, self.selectors["body"])
+                date = self.extract_date(full_post, self.selectors["date"])
+                yield {"title": title, "body": body, "date": date, "url": url}
+            page = self._get_page()
+
+    def _full_post(self, url):
+        fh = urllib.urlopen(url)
+        logging.info("Reading: (%(code)d) %(url)s" % \
+                {"code": fh.getcode(), "url": fh.geturl()})
+        return BeautifulSoup(fh.read(), "html.parser")
+
+    def extract_date(self, post, selector):
+        meta = text(post, selector)
+        match = re.search(r"\d{,2} \w+ \d{4}", meta)
+        return parser.parse(match.group(0))
+
+
 class TriangleExplorer(ParserStrategy):
 
     url = "http://triangleexplorer.com/page/%d/"
@@ -68,7 +104,7 @@ class TriangleExplorer(ParserStrategy):
             "date": "div.entry-meta"}
 
 
-class CarpeDurham(ParserStrategy):
+class CarpeDurhamWordpress(ParserStrategy):
 
     url = "http://carpedurham.wordpress.com/page/%d/"
     city = "Durham, NC"

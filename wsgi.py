@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from flask import Flask
+
 from ui import app
 from ui.controllers import *
 

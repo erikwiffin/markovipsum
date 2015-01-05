@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+<head>
+  <link rel="stylesheet" href="{{ url_for('static', filename="flakes-master/css/all.css") }}">
+  <title>Markov Ipsum</title>
+</head>
+<body>
+    <div class="flakes-frame">
+        <div class="flakes-content">
+            <div class="view-wrap">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

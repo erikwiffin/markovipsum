@@ -6,19 +6,22 @@ from domain.model import blog, markov, city
 class CrawlerService(object):
     "crawls websites"
 
+    table = None
     blogs = [
-            "Carpe Durham",
-            "Triangle Explorer",
-            "Triangle Food Blog"]
+            ("Carpe Durham", 250),
+            #("Carpe Durham Wordpress", 250),
+            #("Triangle Explorer", 250),
+            #("Triangle Food Blog", 50),
+            ]
 
     def scrape(self):
 
         other_repo = sql.PostRepository()
 
-        for name in self.blogs:
+        for name, count in self.blogs:
 
             repo = http.PostRepository.factory(name)
-            posts = repo.range(250)
+            posts = repo.range(count)
 
             for key, post in enumerate(posts):
                 other_repo.add(post)
@@ -38,4 +41,10 @@ class CrawlerService(object):
             table.add_text(post.title)
             table.add_text(post.body)
 
-        return table.get_text(100)
+        self.table = table
+
+    def get_text(self):
+        return self.table.get_text(100)
+
+#service = CrawlerService()
+#service.build()
