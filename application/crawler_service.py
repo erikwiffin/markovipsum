@@ -8,10 +8,10 @@ class CrawlerService(object):
 
     table = None
     blogs = [
-            #("Carpe Durham", 250),
+            ("Carpe Durham", 250),
             #("Carpe Durham Wordpress", 250),
             ("Triangle Explorer", 250),
-            #("Triangle Food Blog", 50),
+            ("Triangle Food Blog", 50),
             ]
 
     def scrape(self):
@@ -45,6 +45,3 @@ class CrawlerService(object):
 
     def get_text(self):
         return self.table.get_text(100)
-
-#service = CrawlerService()
-#service.build()
