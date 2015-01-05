@@ -8,9 +8,9 @@ class CrawlerService(object):
 
     table = None
     blogs = [
-            ("Carpe Durham", 250),
+            #("Carpe Durham", 250),
             #("Carpe Durham Wordpress", 250),
-            #("Triangle Explorer", 250),
+            ("Triangle Explorer", 250),
             #("Triangle Food Blog", 50),
             ]
 
