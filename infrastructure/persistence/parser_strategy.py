@@ -75,7 +75,7 @@ class CarpeDurham(ParserStrategy):
                 url = href(post, self.selectors["url"])
                 full_post = self._full_post(url)
                 title = text(full_post, self.selectors["title"])
-                body = text(full_post, self.selectors["body"])
+                body = self.extract_body(full_post, self.selectors["body"])
                 date = self.extract_date(full_post, self.selectors["date"])
                 yield {"title": title, "body": body, "date": date, "url": url}
             page = self._get_page()
@@ -85,6 +85,13 @@ class CarpeDurham(ParserStrategy):
         logging.info("Reading: (%(code)d) %(url)s" % \
                 {"code": fh.getcode(), "url": fh.geturl()})
         return BeautifulSoup(fh.read(), "html.parser")
+
+    def extract_body(self, post, selector):
+        body = text(post, selector)
+        body = re.sub(r'Carpe Durham does not issue ratings.*', '', body)
+        body = re.sub(r'No members have expressed a view.*', '', body)
+        body = re.sub(r'I generally agree.I generally disagree.', '', body)
+        return body
 
     def extract_date(self, post, selector):
         meta = text(post, selector)
