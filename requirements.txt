@@ -1,3 +1,4 @@
+BaseHash==2.1.0
 beautifulsoup4==4.3.2
 Flask==0.10.1
 Flask-Injector==0.5.0

@@ -7,8 +7,21 @@ class PostRepository(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def manyUntil(self, date):
-        """Return a list of Blog Posts until a date in the past is reached"""
+    def range(self, limit, offset=0):
+        """Return all the Blog Posts inside a given range
+        """
+        pass
+
+    @abstractmethod
+    def add(self, post):
+        """Add a single Blog Post to the Repository
+        """
+        pass
+
+    @abstractmethod
+    def commit(self):
+        """Commit added Blog Posts to the persistence mechanism
+        """
         pass
 
 

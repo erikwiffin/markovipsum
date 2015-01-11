@@ -22,17 +22,11 @@ class PostRepository(blog.PostRepository):
     def __init__(self, parser_strategy):
         self.__parser_strategy = parser_strategy
 
-    def manyUntil(self, date):
-        post = self.__parser_strategy.first()
-        logging.info(post)
-        while post is not None and post['date'] > date:
-            yield blog.Post(
-                    title=post['title'],
-                    body=post['body'],
-                    date=post['date'],
-                    url=post['url'],
-                    city=self.__parser_strategy.city)
-            post = self.__parser_strategy.next()
+    def add(self, post):
+        raise NotImplementedError()
+
+    def commit(self):
+        raise NotImplementedError()
 
     def range(self, limit, offset=0):
         post = self.__parser_strategy.first()
